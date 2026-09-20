@@ -1,0 +1,585 @@
+:root {
+  --background: #fdfaf6;
+  --surface: #ffffff;
+  --surface-muted: #f6efe6;
+  --foreground: #241d15;
+  --muted: #7a6e5f;
+  --border: #e8ddcc;
+  --accent: #c2410c;
+  --accent-hover: #9a3412;
+  --accent-fg: #fffaf5;
+  --accent-soft: #fbe5d6;
+  --success: #166534;
+  --success-soft: #dcf5e3;
+  --danger: #b91c1c;
+  --danger-soft: #fde3e0;
+  --warn: #92400e;
+  --warn-soft: #fdedd3;
+  --shadow: 0 1px 2px rgba(36, 29, 21, 0.04), 0 8px 24px -12px rgba(36, 29, 21, 0.12);
+  --radius: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #16120d;
+    --surface: #1f1911;
+    --surface-muted: #241d15;
+    --foreground: #f3ecdf;
+    --muted: #a89a84;
+    --border: #362c1f;
+    --accent: #ed7d3f;
+    --accent-hover: #f4996b;
+    --accent-fg: #1a1108;
+    --accent-soft: #3a2415;
+    --success: #4ade80;
+    --success-soft: #163523;
+    --danger: #f87171;
+    --danger-soft: #3a1a17;
+    --warn: #fbbf24;
+    --warn-soft: #3a2c0f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px -14px rgba(0, 0, 0, 0.6);
+  }
+  html {
+    color-scheme: dark;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-jakarta), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+}
+
+.container {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 8px 20px 72px;
+}
+
+/* --- Nav --- */
+
+.nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  max-width: 980px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.nav a {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.94rem;
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.nav a:hover {
+  color: var(--foreground);
+}
+
+.nav .brand {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--foreground);
+  letter-spacing: -0.01em;
+}
+
+.nav .spacer {
+  flex: 1;
+}
+
+/* --- Typography --- */
+
+h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 12px 0 8px;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+p.muted,
+.muted {
+  color: var(--muted);
+}
+
+/* --- Hero --- */
+
+.hero {
+  padding: 40px 0 8px;
+}
+
+.hero h1 {
+  font-size: 2.6rem;
+  max-width: 20ch;
+}
+
+.hero p {
+  font-size: 1.08rem;
+  color: var(--muted);
+  max-width: 56ch;
+  margin-top: 6px;
+}
+
+/* --- Landing hero band: the user's own photo (public/hero-kitchen.png),
+   toned down behind a dark scrim so the copy on top stays the focus --- */
+
+.hero-band {
+  position: relative;
+  overflow: hidden;
+  background: #16100a;
+}
+
+.hero-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/hero-kitchen.png");
+  background-size: cover;
+  background-position: center 35%;
+  /* Lowered saturation/brightness — the point is the copy on top, not the
+     photo competing with it. */
+  filter: saturate(0.5) brightness(0.55) contrast(1.05);
+}
+
+.hero-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Darker on the left (behind the text) fading lighter to the right, so
+     the photo still reads at a glance without fighting the copy. Same
+     scrim in both themes on purpose — a photo hero reads as its own dark
+     section regardless of the site's light/dark mode. */
+  background: linear-gradient(
+    100deg,
+    rgba(12, 7, 4, 0.86) 0%,
+    rgba(12, 7, 4, 0.72) 34%,
+    rgba(12, 7, 4, 0.42) 66%,
+    rgba(12, 7, 4, 0.58) 100%
+  );
+}
+
+.hero-band .nav {
+  border-bottom: none;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-band .nav .brand,
+.hero-band .nav a {
+  color: #fff8f0;
+}
+
+.hero-band button.secondary {
+  color: #fff8f0;
+  border-color: rgba(255, 248, 240, 0.55);
+}
+
+.hero-band button.secondary:hover:not(:disabled) {
+  background: rgba(255, 248, 240, 0.14);
+}
+
+.hero-band .container {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-inner {
+  position: relative;
+  padding: 56px 0 88px;
+}
+
+.hero-inner h1 {
+  position: relative;
+  z-index: 1;
+  color: #fff8f0;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.3);
+}
+
+.hero-inner p {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 248, 240, 0.88);
+}
+
+.hero-inner .actions-row {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* --- Cards & grids --- */
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.card-grid .card {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-grid .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(36, 29, 21, 0.06), 0 16px 32px -14px rgba(36, 29, 21, 0.2);
+}
+
+.auth-card {
+  max-width: 420px;
+  margin: 40px auto 0;
+}
+
+/* --- Chips / badges --- */
+
+.chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--surface-muted);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  margin: 2px 4px 2px 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.badge.active {
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+.badge.grace,
+.badge.past_due {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.badge.paused {
+  color: var(--muted);
+  background: var(--surface-muted);
+}
+
+.badge.cancelled {
+  color: var(--muted);
+  background: var(--surface-muted);
+  text-decoration: line-through;
+}
+
+/* --- Forms --- */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 440px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+input,
+select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--foreground);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input:disabled,
+select:disabled {
+  opacity: 0.6;
+}
+
+/* --- Buttons --- */
+
+button {
+  padding: 11px 20px;
+  border: none;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  width: fit-content;
+  transition: background 0.15s ease, transform 0.05s ease, opacity 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+button.secondary:hover:not(:disabled) {
+  background: var(--surface-muted);
+}
+
+button.danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+button.danger:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+/* --- Tables --- */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th {
+  text-align: left;
+  padding: 9px 10px;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:hover {
+  background: var(--surface-muted);
+}
+
+/* --- Misc --- */
+
+.error {
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.success {
+  color: var(--success);
+  font-size: 0.9rem;
+}
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+code {
+  background: var(--surface-muted);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 0.9em;
+}
+
+/* --- Floating chat assistant --- */
+
+.chat-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  z-index: 60;
+}
+
+.chat-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 88px;
+  width: min(360px, calc(100vw - 32px));
+  max-height: min(520px, calc(100vh - 140px));
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  z-index: 60;
+}
+
+.chat-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.chat-panel-header h2 {
+  margin: 0;
+}
+
+.chat-close {
+  width: fit-content;
+  padding: 2px 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.chat-close:hover:not(:disabled) {
+  background: var(--surface-muted);
+}
+
+.chat-panel .chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 4px 2px;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: 9px 13px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.chat-bubble.bot {
+  align-self: flex-start;
+  background: var(--surface-muted);
+  color: var(--foreground);
+  border-bottom-left-radius: 3px;
+}
+
+.chat-bubble.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-bottom-right-radius: 3px;
+}
+
+form.chat-input-row {
+  flex-direction: row;
+  gap: 8px;
+  max-width: none;
+}
+
+form.chat-input-row input {
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .chat-panel {
+    right: 16px;
+    bottom: 84px;
+  }
+
+  .chat-fab {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 1.9rem;
+  }
+  .card {
+    padding: 16px;
+  }
+}

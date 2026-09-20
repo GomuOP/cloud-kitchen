@@ -1,0 +1,428 @@
+// Prisma schema for the tiffin subscription & fulfilment marketplace.
+// See docs/design.md for the reasoning behind every constraint below —
+// this file is deliberately unexplained; the "why" lives there.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SubscriptionStatus {
+  active
+  paused
+  grace
+  past_due
+  cancelled
+
+  @@map("subscription_status")
+}
+
+enum DietaryCategory {
+  veg
+  jain
+  no_onion_garlic
+
+  @@map("dietary_category")
+}
+
+enum OrderStatus {
+  scheduled
+  preparing
+  out_for_delivery
+  delivered
+  skipped
+  failed
+
+  @@map("order_status")
+}
+
+enum PaymentStatus {
+  pending
+  success
+  failed
+
+  @@map("payment_status")
+}
+
+enum JobStatus {
+  running
+  success
+  failed
+
+  @@map("job_status")
+}
+
+enum KitchenStatus {
+  pending_approval
+  active
+  suspended
+
+  @@map("kitchen_status")
+}
+
+enum PayoutStatus {
+  pending
+  paid
+
+  @@map("payout_status")
+}
+
+model MealType {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  plans           Plan[]
+  menus           Menu[]
+  kitchenCapacity KitchenCapacity[]
+  subscriptions   Subscription[]
+  orders          Order[]
+
+  @@map("meal_types")
+}
+
+model DeliveryArea {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  addresses Address[]
+  kitchens  Kitchen[]
+
+  @@map("delivery_areas")
+}
+
+// The aunty's business. A student subscribes to a specific kitchen, not to
+// the platform generically — this is the entity the marketplace pivot
+// introduced. See docs/design.md "Phase 3".
+model Kitchen {
+  id           String        @id @default(cuid())
+  ownerName    String        @map("owner_name")
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  phone        String?
+  name         String
+  bio          String?
+  areaId       String        @map("area_id")
+  status       KitchenStatus @default(pending_approval)
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  approvedAt   DateTime?     @map("approved_at") @db.Timestamptz(3)
+
+  area          DeliveryArea      @relation(fields: [areaId], references: [id])
+  plans         Plan[]
+  menus         Menu[]
+  capacity      KitchenCapacity[]
+  subscriptions Subscription[]
+  orders        Order[]
+  payments      Payment[]
+  payouts       Payout[]
+
+  @@map("kitchens")
+}
+
+model Plan {
+  id           String   @id @default(cuid())
+  kitchenId    String   @map("kitchen_id")
+  name         String
+  mealTypeId   String   @map("meal_type_id")
+  mealsPerWeek Int      @map("meals_per_week")
+  pricePaise   Int      @map("price_paise")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  kitchen       Kitchen        @relation(fields: [kitchenId], references: [id])
+  mealType      MealType       @relation(fields: [mealTypeId], references: [id])
+  subscriptions Subscription[]
+
+  @@index([kitchenId])
+  @@map("plans")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  phone        String?  @unique
+  name         String
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  addresses     Address[]
+  subscriptions Subscription[]
+  payments      Payment[]
+
+  @@map("users")
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  line1     String
+  line2     String?
+  areaId    String   @map("area_id")
+  pincode   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user          User           @relation(fields: [userId], references: [id])
+  area          DeliveryArea   @relation(fields: [areaId], references: [id])
+  subscriptions Subscription[]
+  orders        Order[]
+
+  @@map("addresses")
+}
+
+model Subscription {
+  id                String             @id @default(cuid())
+  userId            String             @map("user_id")
+  kitchenId         String             @map("kitchen_id")
+  planId            String             @map("plan_id")
+  mealTypeId        String             @map("meal_type_id")
+  addressId         String             @map("address_id")
+  dietaryPreference DietaryCategory    @map("dietary_preference")
+  status            SubscriptionStatus @default(active)
+  statusSince       DateTime           @default(now()) @map("status_since") @db.Timestamptz(3)
+
+  currentCycleStart DateTime @map("current_cycle_start") @db.Timestamptz(3)
+  currentCycleEnd   DateTime @map("current_cycle_end") @db.Timestamptz(3)
+  nextBillingDate   DateTime @map("next_billing_date") @db.Timestamptz(3)
+
+  // Set when entering grace/past_due; cleared on leaving. Stored explicitly
+  // rather than recomputed from statusSince + a config duration, so a later
+  // change to the grace/past_due window length can't retroactively alter the
+  // deadline for subscriptions already mid-state. See docs/design.md.
+  graceExpiresAt   DateTime? @map("grace_expires_at") @db.Timestamptz(3)
+  pastDueExpiresAt DateTime? @map("past_due_expires_at") @db.Timestamptz(3)
+
+  // Cancellation is requested at one time and takes effect at another
+  // (immediate: same instant; deferred: current_cycle_end). The order
+  // generation job reads cancelEffectiveAt, not just status, to decide
+  // whether "tomorrow" is still covered.
+  cancelRequestedAt DateTime? @map("cancel_requested_at") @db.Timestamptz(3)
+  cancelEffectiveAt DateTime? @map("cancel_effective_at") @db.Timestamptz(3)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user          User                        @relation(fields: [userId], references: [id])
+  kitchen       Kitchen                     @relation(fields: [kitchenId], references: [id])
+  plan          Plan                        @relation(fields: [planId], references: [id])
+  mealType      MealType                    @relation(fields: [mealTypeId], references: [id])
+  address       Address                     @relation(fields: [addressId], references: [id])
+  statusHistory SubscriptionStatusHistory[]
+  pauses        SubscriptionPause[]
+  skips         DailySkip[]
+  orders        Order[]
+  payments      Payment[]
+
+  @@index([status])
+  @@index([kitchenId])
+  @@map("subscriptions")
+}
+
+// Append-only audit trail. Every subscription.status write happens alongside
+// a row here — this table is the evidence that transitions are explicit.
+model SubscriptionStatusHistory {
+  id             String              @id @default(cuid())
+  subscriptionId String              @map("subscription_id")
+  fromStatus     SubscriptionStatus? @map("from_status")
+  toStatus       SubscriptionStatus  @map("to_status")
+  reason         String?
+  actor          String
+  occurredAt     DateTime            @default(now()) @map("occurred_at") @db.Timestamptz(3)
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([subscriptionId])
+  @@map("subscription_status_history")
+}
+
+// A pause is its own record (not just a status flag) because current_cycle_end
+// extension math needs a start/end per pause, and a subscription accumulates
+// many of these across its lifetime.
+model SubscriptionPause {
+  id             String    @id @default(cuid())
+  subscriptionId String    @map("subscription_id")
+  pausedAt       DateTime  @map("paused_at") @db.Timestamptz(3)
+  resumeAt       DateTime? @map("resume_at") @db.Timestamptz(3)
+  resumedAt      DateTime? @map("resumed_at") @db.Timestamptz(3)
+  reason         String?
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([subscriptionId])
+  @@map("subscription_pauses")
+}
+
+// A single-day skip does not change subscription.status; it's a row that
+// order generation checks against. skipDate is a calendar date (no tz),
+// matching the business day the kitchen and customer both mean by "tomorrow".
+model DailySkip {
+  id             String   @id @default(cuid())
+  subscriptionId String   @map("subscription_id")
+  skipDate       DateTime @db.Date @map("skip_date")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@unique([subscriptionId, skipDate])
+  @@map("daily_skips")
+}
+
+model Menu {
+  id         String   @id @default(cuid())
+  date       DateTime @db.Date
+  kitchenId  String   @map("kitchen_id")
+  mealTypeId String   @map("meal_type_id")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  kitchen  Kitchen    @relation(fields: [kitchenId], references: [id])
+  mealType MealType   @relation(fields: [mealTypeId], references: [id])
+  items    MenuItem[]
+
+  @@unique([date, kitchenId, mealTypeId])
+  @@map("menus")
+}
+
+// Exactly one item per dietary category per menu — this is what makes the
+// jain -> no_onion_garlic -> veg substitution chain a well-defined lookup
+// rather than a search.
+model MenuItem {
+  id              String          @id @default(cuid())
+  menuId          String          @map("menu_id")
+  name            String
+  dietaryCategory DietaryCategory @map("dietary_category")
+
+  menu   Menu    @relation(fields: [menuId], references: [id])
+  orders Order[]
+
+  @@unique([menuId, dietaryCategory])
+  @@map("menu_items")
+}
+
+// The hot row the capacity race locks against: SELECT ... FOR UPDATE on
+// (date, kitchen_id, meal_type_id) inside the signup transaction. Scoped per
+// kitchen since each aunty has her own daily cooking limit. See docs/design.md.
+model KitchenCapacity {
+  id            String   @id @default(cuid())
+  date          DateTime @db.Date
+  kitchenId     String   @map("kitchen_id")
+  mealTypeId    String   @map("meal_type_id")
+  maxCapacity   Int      @map("max_capacity")
+  reservedCount Int      @default(0) @map("reserved_count")
+
+  kitchen  Kitchen  @relation(fields: [kitchenId], references: [id])
+  mealType MealType @relation(fields: [mealTypeId], references: [id])
+
+  @@unique([date, kitchenId, mealTypeId])
+  @@map("kitchen_capacity")
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  subscriptionId String      @map("subscription_id")
+  kitchenId      String      @map("kitchen_id")
+  deliveryDate   DateTime    @db.Date @map("delivery_date")
+  mealTypeId     String      @map("meal_type_id")
+  menuItemId     String      @map("menu_item_id")
+  addressId      String      @map("address_id")
+  status         OrderStatus @default(scheduled)
+  amountPaise    Int         @map("amount_paise")
+
+  // Set when the subscriber's preference wasn't on the day's menu and a
+  // substitution chain kicked in. Null means no substitution occurred.
+  substitutedFrom DietaryCategory? @map("substituted_from")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  kitchen      Kitchen      @relation(fields: [kitchenId], references: [id])
+  mealType     MealType     @relation(fields: [mealTypeId], references: [id])
+  menuItem     MenuItem     @relation(fields: [menuItemId], references: [id])
+  address      Address      @relation(fields: [addressId], references: [id])
+
+  // THE idempotency mechanism for daily order generation: re-running the job
+  // for a date that's already materialized hits this constraint and no-ops
+  // via ON CONFLICT DO NOTHING, regardless of why it's re-running.
+  @@unique([subscriptionId, deliveryDate, mealTypeId])
+  @@index([deliveryDate, kitchenId])
+  @@map("orders")
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  userId             String        @map("user_id")
+  kitchenId          String        @map("kitchen_id")
+  subscriptionId     String?       @map("subscription_id")
+  billingPeriodStart DateTime      @db.Date @map("billing_period_start")
+  amountPaise        Int           @map("amount_paise")
+  status             PaymentStatus @default(pending)
+  providerRef        String?       @map("provider_ref")
+
+  // Same idempotency pattern as orders: a retried charge attempt reuses the
+  // same key and can't double-charge.
+  idempotencyKey String @unique @map("idempotency_key")
+
+  // Null until this payment has been folded into a Payout — a payment can
+  // be settled to its kitchen at most once. Same "mark it consumed" pattern
+  // as the idempotency mechanisms elsewhere in this project.
+  payoutId String? @map("payout_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user         User          @relation(fields: [userId], references: [id])
+  kitchen      Kitchen       @relation(fields: [kitchenId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  payout       Payout?       @relation(fields: [payoutId], references: [id])
+
+  @@index([kitchenId, payoutId])
+  @@map("payments")
+}
+
+// Commission settlement for a kitchen: aggregates payments not yet paid out.
+// grossPaise is the sum of those payments; commissionPaise is the
+// platform's cut computed from commissionRateBps (basis points — integer,
+// never a float percentage, for the same reason money itself is paise);
+// netPaise is what's owed to the aunty.
+model Payout {
+  id                 String       @id @default(cuid())
+  kitchenId          String       @map("kitchen_id")
+  periodStart        DateTime     @map("period_start") @db.Timestamptz(3)
+  periodEnd          DateTime     @map("period_end") @db.Timestamptz(3)
+  grossPaise         Int          @map("gross_paise")
+  commissionRateBps  Int          @map("commission_rate_bps")
+  commissionPaise    Int          @map("commission_paise")
+  netPaise           Int          @map("net_paise")
+  status             PayoutStatus @default(pending)
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  paidAt             DateTime?    @map("paid_at") @db.Timestamptz(3)
+
+  kitchen  Kitchen   @relation(fields: [kitchenId], references: [id])
+  payments Payment[]
+
+  @@index([kitchenId])
+  @@map("payouts")
+}
+
+// Observability/orchestration ledger for the daily order-generation job.
+// Not a correctness mechanism — the job is idempotent via its own unique
+// constraint on `orders` — but it's what lets an admin see "did today's
+// generation finish" and know whether to retry it.
+model JobRun {
+  id           String    @id @default(cuid())
+  jobName      String    @map("job_name")
+  runDate      DateTime  @db.Date @map("run_date")
+  status       JobStatus
+  attempt      Int       @default(1)
+  startedAt    DateTime  @map("started_at") @db.Timestamptz(3)
+  finishedAt   DateTime? @map("finished_at") @db.Timestamptz(3)
+  errorMessage String?   @map("error_message")
+
+  @@unique([jobName, runDate])
+  @@map("job_runs")
+}

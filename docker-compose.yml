@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: meal
+      POSTGRES_PASSWORD: meal
+      POSTGRES_DB: meal_service
+    ports:
+      - "5432:5432"
+    volumes:
+      - meal_service_db:/var/lib/postgresql/data
+
+volumes:
+  meal_service_db:
