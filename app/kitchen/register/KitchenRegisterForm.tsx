@@ -32,7 +32,7 @@ export function KitchenRegisterForm({ areas }: { areas: { id: string; name: stri
       </label>
       <label>
         Kitchen name
-        <input name="name" required placeholder="e.g. Lakshmi's Tiffin" disabled={pending} />
+        <input name="name" required placeholder="e.g. Lakshmi's Cloud Kitchen" disabled={pending} />
       </label>
       <label>
         Short description (optional)

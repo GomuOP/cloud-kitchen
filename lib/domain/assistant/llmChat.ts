@@ -23,7 +23,7 @@ export interface ChatTurn {
   text: string;
 }
 
-const SYSTEM_PROMPT = `You are the customer-support assistant for Tiffin, a meal-subscription marketplace. You help a single logged-in customer with their own tiffin subscriptions only — nothing else (no general knowledge questions, no other customers' data, no platform-wide questions).
+const SYSTEM_PROMPT = `You are the customer-support assistant for Cloud Kitchen Subscription, a meal-subscription marketplace. You help a single logged-in customer with their own meal subscriptions only — nothing else (no general knowledge questions, no other customers' data, no platform-wide questions).
 
 Rules:
 - Never guess or make up subscription, order, or delivery data. Always call a tool to get real data before answering a factual question.
@@ -145,7 +145,7 @@ async function callOpenRouter(messages: OpenRouterMessage[]): Promise<{
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "X-Title": "Tiffin assistant",
+      "X-Title": "Cloud Kitchen Subscription assistant",
     },
     body: JSON.stringify({
       model: MODEL,

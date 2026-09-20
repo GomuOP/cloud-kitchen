@@ -43,7 +43,7 @@ export default async function KitchenMenuPage({
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
         <div className="spacer" />
         <Link href="/kitchen">Dashboard</Link>
         <form action={logoutKitchenOwner}><button className="secondary" type="submit">Log out</button></form>

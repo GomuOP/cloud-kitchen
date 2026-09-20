@@ -32,7 +32,7 @@ export default async function KitchenDetailPage({ params }: { params: Promise<{ 
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
         <Link href="/kitchens">Back to kitchens</Link>
         <div className="spacer" />
         {userId && <Link href="/account">My account</Link>}

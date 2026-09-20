@@ -5,7 +5,7 @@ export default function LoginPage() {
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
         <div className="spacer" />
       </nav>
       <div className="container">

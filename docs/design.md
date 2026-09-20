@@ -965,3 +965,34 @@ Verified live via the same three screenshots as Phase 13 (light, dark,
 390px mobile) — the photo is clearly visible as a kitchen scene without
 straining to compete with the heading, subhead, or buttons in any of the
 three.
+
+## Phase 15: second brand rename, "Tiffin" to "Cloud Kitchen Subscription"
+
+**Brand renamed again**, from "The Tiffin Tribe" (Phase 8) to "Cloud
+Kitchen Subscription" (user decision) — the word "Tiffin" and its regional
+connotation was deliberately dropped in favor of "cloud kitchen," a more
+widely recognized term for a delivery-only kitchen operation. Updated
+everywhere the old brand text appeared: every page's nav-bar `brand` link
+(and its emoji, 🍱 → 🍳, to drop the tiffin-box imagery alongside the
+word), `layout.tsx`'s `<title>`, the Razorpay checkout modal's merchant
+display name in `SubscribeForm.tsx`, the landing-page hero copy ("tiffins"
+→ "meals"), the LLM assistant's system prompt and its OpenRouter
+`X-Title` header, the seeded kitchen name `Lakshmi's Tiffin` → `Lakshmi's
+Cloud Kitchen` (both in `seed.ts` and the already-seeded Neon row, updated
+directly since re-running the seed script doesn't touch existing rows),
+and the kitchen-registration form's placeholder text. `README.md` and
+`CLAUDE.md`'s own titles were updated too.
+
+**The demo password `tiffin123` was deliberately left unchanged** (agent
+decision, not asked): it's a credential value, not display branding, and
+the kitchen-owner accounts (`lakshmi@example.com`, `kamala@example.com`)
+were already seeded against a live Neon database with a password hash
+derived from that exact string before this rename happened. Changing the
+constant without also resetting those already-seeded passwords would
+desync the docs from the deployed data; resetting them was judged
+out of scope for a branding change. If the "tiffin123" wording matters,
+it's a separate, small follow-up.
+
+Historical entries above (Phase 8's brand-rename record, and the
+tiffin-carrier SVG described in Phases 13–14) are left as-written — they
+describe what was true at the time, not the current state.

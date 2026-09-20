@@ -5,7 +5,7 @@ export default function AdminLoginPage() {
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
       </nav>
       <div className="container">
         <div className="card auth-card">

@@ -9,7 +9,7 @@ export default function StartPage() {
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
       </nav>
       <div className="container">
         <div className="hero" style={{ paddingBottom: 0 }}>

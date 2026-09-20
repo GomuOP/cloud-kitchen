@@ -35,7 +35,7 @@ export default async function AdminPage() {
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
         <div className="spacer" />
         <form action={logoutAdmin}><button className="secondary" type="submit">Log out</button></form>
       </nav>

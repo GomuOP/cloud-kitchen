@@ -70,7 +70,7 @@ export function SubscribeForm({
         amount: order.amountPaise,
         currency: "INR",
         order_id: order.orderId,
-        name: "The Tiffin Tribe",
+        name: "Cloud Kitchen Subscription",
         description: "Subscription payment (test mode)",
         theme: { color: "#c2560f" },
         handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {

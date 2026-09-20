@@ -79,7 +79,7 @@ async function main() {
       ownerName: "Lakshmi Amma",
       email: "lakshmi@example.com",
       passwordHash: demoPasswordHash,
-      name: "Lakshmi's Tiffin",
+      name: "Lakshmi's Cloud Kitchen",
       bio: "Home-style South Indian, veg only, 20 years of cooking for the neighborhood.",
       areaId: koramangala.id,
     });

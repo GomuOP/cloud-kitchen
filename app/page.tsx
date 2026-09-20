@@ -5,13 +5,13 @@ export default function Home() {
     <>
       <div className="hero-band">
         <nav className="nav">
-          <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+          <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
           <div className="spacer" />
           <Link href="/start"><button>Log in / Sign up</button></Link>
         </nav>
         <div className="container">
           <div className="hero hero-inner">
-            <h1>Home-cooked tiffins, subscribed directly from the chef who makes them.</h1>
+            <h1>Home-cooked meals, subscribed directly from the chef who makes them.</h1>
             <p>
               Kitchens run by home cooks list their own meal subscriptions; students subscribe
               directly to the kitchen of their choice. The platform handles matching, capacity, and

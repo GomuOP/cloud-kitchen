@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 function KitchenNav() {
   return (
     <nav className="nav">
-      <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+      <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
       <div className="spacer" />
       <Link href="/kitchen/menu">Menu</Link>
       <form action={logoutKitchenOwner}><button className="secondary" type="submit">Log out</button></form>

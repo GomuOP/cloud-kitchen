@@ -21,7 +21,7 @@ export default async function KitchensPage({
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
         <div className="spacer" />
         <Link href="/login">Student login</Link>
       </nav>

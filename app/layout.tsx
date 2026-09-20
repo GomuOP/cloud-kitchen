@@ -11,7 +11,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "The Tiffin Tribe — subscription marketplace",
+  title: "Cloud Kitchen Subscription — meal marketplace",
   description: "Meal subscription & fulfilment marketplace",
 };
 

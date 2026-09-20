@@ -10,7 +10,7 @@ export default async function RegisterKitchenPage() {
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
         <div className="spacer" />
         <Link href="/kitchen/login">Already registered? Log in</Link>
       </nav>

@@ -1,4 +1,4 @@
-# Tiffin Subscription & Fulfilment Service
+# Cloud Kitchen Subscription & Fulfilment Service
 
 Portfolio project for SDE placement interviews. The point of the project is the
 subscription/fulfilment domain logic (state machine, idempotent job, capacity

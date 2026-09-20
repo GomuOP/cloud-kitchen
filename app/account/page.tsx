@@ -48,7 +48,7 @@ export default async function AccountPage() {
   return (
     <>
       <nav className="nav">
-        <Link href="/" className="brand">🍱 The Tiffin Tribe</Link>
+        <Link href="/" className="brand">🍳 Cloud Kitchen Subscription</Link>
         <Link href="/kitchens">Browse kitchens</Link>
         <div className="spacer" />
         <span className="muted">{user.name}</span>
