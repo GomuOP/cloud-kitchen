@@ -9,9 +9,7 @@ This is a portfolio project — the point is the subscription/fulfilment **domai
 (state machine, idempotent jobs, capacity races, dietary substitution), not the UI. Every
 feature below links to where it lives and, briefly, how it works; the full reasoning
 (alternatives considered, why they were rejected) is in `docs/design.md`, recorded phase by
-phase as the project evolved. See `CLAUDE.md` for the project's standing rules and `DEPLOY.md`
-for the deployment handoff.
-
+phase as the project evolved. 
 ## Local setup
 
 Requires Node 20+, npm, and Docker (for Postgres).
